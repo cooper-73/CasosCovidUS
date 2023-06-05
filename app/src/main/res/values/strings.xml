@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Casos Covid US</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!--    Main Activity-->
+    <string name="main_all_option">All</string>
+    <string name="main_favorites_option">Favorites</string>
 </resources>
