@@ -14,7 +14,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainViewModel
-    private val fragment = ListFragment.newInstance()
+    private var fragment = ListFragment.newInstance(true)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,7 +23,6 @@ class MainActivity : AppCompatActivity() {
 
         bindViewModel()
         initObservers()
-        initUI()
         initListeners()
     }
 
@@ -33,16 +32,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun initObservers() {
         viewModel.isAllListSelected.observe(this) { isAllListSelected ->
-            if (isAllListSelected) {
+            fragment = if (isAllListSelected) {
                 showAllOptionSelected()
+                ListFragment.newInstance(true)
             } else {
                 showFavoritesOptionSelected()
+                ListFragment.newInstance(false)
             }
+            supportFragmentManager.beginTransaction().replace(R.id.fl_container, fragment).commit()
         }
-    }
-
-    private fun initUI() {
-        supportFragmentManager.beginTransaction().add(R.id.fl_container, fragment).commit()
     }
 
     private fun initListeners() {
