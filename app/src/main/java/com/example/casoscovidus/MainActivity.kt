@@ -4,12 +4,14 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.example.casoscovidus.databinding.ActivityMainBinding
 import com.example.casoscovidus.ui.fragments.ListFragment
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var viewModel: MainViewModel
     private val fragment = ListFragment.newInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,8 +19,24 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        bindViewModel()
+        initObservers()
         initUI()
         initListeners()
+    }
+
+    private fun bindViewModel() {
+        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
+    }
+
+    private fun initObservers() {
+        viewModel.isAllListSelected.observe(this) { isAllListSelected ->
+            if (isAllListSelected) {
+                showAllOptionSelected()
+            } else {
+                showFavoritesOptionSelected()
+            }
+        }
     }
 
     private fun initUI() {
@@ -27,11 +45,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun initListeners() {
         binding.tvAllList.setOnClickListener {
-            showAllOptionSelected()
+            viewModel.markAllListSelected(true)
         }
 
         binding.tvFavoriteList.setOnClickListener {
-            showFavoritesOptionSelected()
+            viewModel.markAllListSelected(false)
         }
     }
 
