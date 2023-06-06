@@ -1,4 +1,4 @@
-package com.example.casoscovidus
+package com.example.casoscovidus.viewmodels
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

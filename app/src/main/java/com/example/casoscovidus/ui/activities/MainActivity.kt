@@ -1,12 +1,14 @@
-package com.example.casoscovidus
+package com.example.casoscovidus.ui.activities
 
 import android.graphics.Typeface
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.example.casoscovidus.R
 import com.example.casoscovidus.databinding.ActivityMainBinding
 import com.example.casoscovidus.ui.fragments.ListFragment
+import com.example.casoscovidus.viewmodels.MainViewModel
 
 class MainActivity : AppCompatActivity() {
 
