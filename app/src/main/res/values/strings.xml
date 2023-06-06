@@ -4,4 +4,10 @@
     <!--    Main Activity-->
     <string name="main_all_option">All</string>
     <string name="main_favorites_option">Favorites</string>
+    <!--    List Fragment-->
+    <string name="last_update_msg">Last checked: %1$s</string>
+    <!--    Report Item-->
+    <string name="date_msg">Date: %1$s</string>
+    <string name="positive_msg">Positive: %1$d ( + %2$d )</string>
+    <string name="death_msg">Death: %1$d ( + %2$d )</string>
 </resources>
