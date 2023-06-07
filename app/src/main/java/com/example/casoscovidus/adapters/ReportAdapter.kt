@@ -32,9 +32,11 @@ class ReportAdapter : RecyclerView.Adapter<ReportAdapter.ViewHolder>() {
             )
             binding.chbFavorite.isChecked = report.isFavorite
 
-            binding.chbFavorite.setOnCheckedChangeListener { _, isChecked ->
-                val msg = if (isChecked) "Marked as favorite" else "Unmarked as favorite"
-                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+            binding.chbFavorite.setOnCheckedChangeListener { buttonView, isChecked ->
+                if (buttonView.isPressed) {
+                    val msg = if (isChecked) "Marked as favorite" else "Unmarked as favorite"
+                    Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
