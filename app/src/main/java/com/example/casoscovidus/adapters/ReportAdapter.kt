@@ -7,9 +7,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.casoscovidus.R
 import com.example.casoscovidus.data.models.Report
 import com.example.casoscovidus.databinding.ReportItemBinding
+import com.example.casoscovidus.utils.formatWithSeparator
+import com.example.casoscovidus.utils.toDate
 
-class ReportAdapter() :
-    RecyclerView.Adapter<ReportAdapter.ViewHolder>() {
+class ReportAdapter : RecyclerView.Adapter<ReportAdapter.ViewHolder>() {
 
     private var reports: List<Report> = listOf()
 
@@ -17,11 +18,18 @@ class ReportAdapter() :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(report: Report) {
             val context = binding.root.context
-            binding.tvDate.text = context.getString(R.string.date_msg, report.date.toString())
-            binding.tvPositive.text =
-                context.getString(R.string.positive_msg, report.positive, report.positiveIncrease)
-            binding.tvDeath.text =
-                context.getString(R.string.death_msg, report.death, report.deathIncrease)
+
+            binding.tvDate.text = context.getString(R.string.date_msg, report.date.toDate())
+            binding.tvPositive.text = context.getString(
+                R.string.positive_msg,
+                report.positive.formatWithSeparator(),
+                report.positiveIncrease.formatWithSeparator()
+            )
+            binding.tvDeath.text = context.getString(
+                R.string.death_msg,
+                report.death.formatWithSeparator(),
+                report.deathIncrease.formatWithSeparator()
+            )
             binding.chbFavorite.isChecked = report.isFavorite
 
             binding.chbFavorite.setOnCheckedChangeListener { _, isChecked ->
@@ -37,8 +45,7 @@ class ReportAdapter() :
         // Sets view root with width MATCH_PARENT and height WRAP_CONTENT
         binding.root.apply {
             this.layoutParams = RecyclerView.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
             )
         }
 
