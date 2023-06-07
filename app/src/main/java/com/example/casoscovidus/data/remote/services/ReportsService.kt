@@ -5,5 +5,5 @@ import retrofit2.http.GET
 
 interface ReportsService {
     @GET ("v1/us/daily.json")
-    fun getReports(): List<Report>
+    suspend fun getReports(): List<Report>
 }

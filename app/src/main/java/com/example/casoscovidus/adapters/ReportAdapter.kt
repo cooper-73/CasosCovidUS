@@ -11,7 +11,7 @@ import com.example.casoscovidus.databinding.ReportItemBinding
 class ReportAdapter() :
     RecyclerView.Adapter<ReportAdapter.ViewHolder>() {
 
-    private lateinit var reports: List<Report>
+    private var reports: List<Report> = listOf()
 
     inner class ViewHolder(private val binding: ReportItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
