@@ -72,9 +72,9 @@ class ReportAdapter(owner: ViewModelStoreOwner, val fragmentHolderType: Fragment
         holder.bind(report, position)
     }
 
-    fun setData(reports: List<Report>?) {
-        this.reports.addAll(reports ?: listOf())
-        notifyItemRangeChanged(0, reports?.size ?: 0)
+    fun setData(reports: List<Report>) {
+        this.reports.addAll(reports)
+        notifyItemRangeChanged(0, reports.size)
     }
 
     fun removeItem(position: Int) {

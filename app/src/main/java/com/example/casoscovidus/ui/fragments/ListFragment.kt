@@ -61,11 +61,11 @@ class ListFragment : Fragment() {
     private fun initObservers() {
         if (fragmentType == FragmentType.ALL) {
             viewModel.reports.observe(viewLifecycleOwner) { reports ->
-                adapter.setData(reports)
+                adapter.setData(reports ?: listOf())
             }
         } else if (fragmentType == FragmentType.FAVORITES) {
             viewModel.favorites.observe(viewLifecycleOwner) { favorites ->
-                adapter.setData(favorites)
+                adapter.setData(favorites ?: listOf())
             }
         }
 
@@ -78,13 +78,22 @@ class ListFragment : Fragment() {
             if (loadingStatus == LoadingStatus.LOADING) {
                 binding.pbLoading.visibility = View.VISIBLE
             } else {
-                if (loadingStatus == LoadingStatus.ERROR) {
-                    Toast.makeText(
+                when (loadingStatus) {
+                    LoadingStatus.NO_INTERNET_CONNECTION -> Toast.makeText(
+                        context,
+                        getString(R.string.no_internet_connection_msg),
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    LoadingStatus.ERROR -> Toast.makeText(
                         context,
                         getString(R.string.unexpected_error_msg),
                         Toast.LENGTH_SHORT
                     ).show()
+
+                    else -> {}
                 }
+
                 binding.pbLoading.visibility = View.GONE
             }
         }
@@ -117,10 +126,6 @@ class ListFragment : Fragment() {
         viewModel.fetchingStatus.observe(viewLifecycleOwner) { fetchingStatus ->
             if (fetchingStatus != FetchingStatus.LOADING) {
                 binding.swlReports.isRefreshing = false
-
-                if (fragmentType == FragmentType.ALL) {
-                    viewModel.loadReports()
-                }
 
                 when (fetchingStatus) {
                     FetchingStatus.NO_INTERNET_CONNECTION -> Toast.makeText(

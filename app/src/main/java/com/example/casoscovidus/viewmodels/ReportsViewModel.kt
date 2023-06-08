@@ -22,16 +22,12 @@ class ReportsViewModel : ViewModel() {
     private val _fetchingStatus = MutableLiveData<FetchingStatus>()
     val fetchingStatus: LiveData<FetchingStatus> = _fetchingStatus
 
-    val reports: LiveData<List<Report>> = repository.reports
-    val favorites: LiveData<List<Report>> = repository.favorites
-
-    init {
-        fetchReports()
-    }
+    val reports: LiveData<List<Report>?> = repository.reports
+    val favorites: LiveData<List<Report>?> = repository.favorites
 
     fun fetchReports() {
-        _lastChecked.value = Date()
         viewModelScope.launch {
+            _lastChecked.value = Date()
             try {
                 _fetchingStatus.value = FetchingStatus.LOADING
                 repository.fetchReports()
@@ -46,10 +42,15 @@ class ReportsViewModel : ViewModel() {
 
     fun loadReports() {
         viewModelScope.launch {
+            _lastChecked.value = Date()
             try {
                 _loadingStatus.value = LoadingStatus.LOADING
+                repository.fetchReports()
                 repository.getReports()
                 _loadingStatus.value = LoadingStatus.DONE
+            } catch (e: UnknownHostException) {
+                repository.getReports()
+                _loadingStatus.value = LoadingStatus.NO_INTERNET_CONNECTION
             } catch (e: Exception) {
                 _loadingStatus.value = LoadingStatus.ERROR
             }
