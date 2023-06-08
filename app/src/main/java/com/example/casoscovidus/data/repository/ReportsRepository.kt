@@ -13,6 +13,7 @@ class ReportsRepository {
     val reports = MutableLiveData<List<Report>?>()
     val favorites = MutableLiveData<List<Report>?>()
 
+    // Fetches data from services and stores response in local database if successful
     suspend fun fetchReports() {
         return withContext(Dispatchers.IO) {
             val reportsResponse = RetrofitClient.reportsService.getReports()
@@ -25,15 +26,21 @@ class ReportsRepository {
         }
     }
 
+    // Retrieves all reports from local database if there are no reports try fetching new reports
     suspend fun getReports() {
         return withContext(Dispatchers.IO) {
-            val reportList = database.reportDao().getReports()
+            var reportList = database.reportDao().getReports()
+            if (reportList.isEmpty()) {
+                fetchReports()
+                reportList = database.reportDao().getReports()
+            }
             withContext(Dispatchers.Main) {
                 reports.value = reportList
             }
         }
     }
 
+    // Retrieves favorite reports from local database
     suspend fun getFavorites() {
         return withContext(Dispatchers.IO) {
             val favoriteList = database.reportDao().getFavorites()
@@ -43,6 +50,7 @@ class ReportsRepository {
         }
     }
 
+    // Updates the value of isFavorite of a report in local database
     suspend fun updateFavoriteFieldOfReport(reportId: String, isFavorite: Boolean) {
         return withContext(Dispatchers.IO) {
             val report = database.reportDao().getReport(reportId).copy(isFavorite = isFavorite)

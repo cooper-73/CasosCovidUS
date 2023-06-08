@@ -27,6 +27,17 @@ class ListFragment : Fragment() {
     private lateinit var adapter: ReportAdapter
     private var fragmentType: FragmentType = FragmentType.ALL
 
+    companion object {
+        @JvmStatic
+        fun newInstance(fragmentType: FragmentType): ListFragment {
+            return ListFragment().apply {
+                arguments = Bundle().apply {
+                    putSerializable(FRAGMENT_TYPE, fragmentType)
+                }
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -75,26 +86,22 @@ class ListFragment : Fragment() {
         }
 
         viewModel.loadingStatus.observe(viewLifecycleOwner) { loadingStatus ->
-            if (loadingStatus == LoadingStatus.LOADING) {
-                binding.pbLoading.visibility = View.VISIBLE
-            } else {
-                when (loadingStatus) {
-                    LoadingStatus.NO_INTERNET_CONNECTION -> Toast.makeText(
-                        context,
-                        getString(R.string.no_internet_connection_msg),
-                        Toast.LENGTH_SHORT
-                    ).show()
+            when (loadingStatus) {
+                LoadingStatus.LOADING -> setProgressBarVisibility(View.VISIBLE)
 
-                    LoadingStatus.ERROR -> Toast.makeText(
-                        context,
-                        getString(R.string.unexpected_error_msg),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                LoadingStatus.DONE -> setProgressBarVisibility(View.GONE)
 
-                    else -> {}
+                LoadingStatus.NO_INTERNET_CONNECTION -> {
+                    showToast(R.string.no_internet_connection_msg)
+                    setProgressBarVisibility(View.GONE)
                 }
 
-                binding.pbLoading.visibility = View.GONE
+                LoadingStatus.ERROR -> {
+                    showToast(R.string.unexpected_error_msg)
+                    setProgressBarVisibility(View.GONE)
+                }
+
+                else -> {}
             }
         }
     }
@@ -105,6 +112,7 @@ class ListFragment : Fragment() {
         }
 
         binding.swlReports.setColorSchemeColors(getPrimaryColor())
+        // Settings for the recycler view and its adapter
         binding.rvReports.layoutManager = LinearLayoutManager(context)
         adapter = ReportAdapter(this, fragmentType)
         binding.rvReports.adapter = adapter
@@ -120,6 +128,7 @@ class ListFragment : Fragment() {
         return typedValue.resourceId
     }
 
+    // Handles fetching behavior when user has swiped the refresh layout
     private fun fetchNewReports() {
         binding.swlReports.isRefreshing = true
 
@@ -128,17 +137,9 @@ class ListFragment : Fragment() {
                 binding.swlReports.isRefreshing = false
 
                 when (fetchingStatus) {
-                    FetchingStatus.NO_INTERNET_CONNECTION -> Toast.makeText(
-                        context,
-                        getString(R.string.no_internet_connection_msg),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    FetchingStatus.NO_INTERNET_CONNECTION -> showToast(R.string.no_internet_connection_msg)
 
-                    FetchingStatus.ERROR -> Toast.makeText(
-                        context,
-                        getString(R.string.unexpected_error_msg),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    FetchingStatus.ERROR -> showToast(R.string.unexpected_error_msg)
 
                     else -> {}
                 }
@@ -147,9 +148,10 @@ class ListFragment : Fragment() {
             }
         }
 
-        viewModel.fetchReports()
+        viewModel.fetchAngGetReports()
     }
 
+    // Tells view model to retrieve data
     private fun loadData() {
         when (fragmentType) {
             FragmentType.ALL -> viewModel.loadReports()
@@ -157,14 +159,10 @@ class ListFragment : Fragment() {
         }
     }
 
-    companion object {
-        @JvmStatic
-        fun newInstance(fragmentType: FragmentType): ListFragment {
-            return ListFragment().apply {
-                arguments = Bundle().apply {
-                    putSerializable(FRAGMENT_TYPE, fragmentType)
-                }
-            }
-        }
+    private fun setProgressBarVisibility(visibility: Int) {
+        binding.pbLoading.visibility = visibility
     }
+
+    private fun showToast(stringResourceId: Int) =
+        Toast.makeText(context, getString(stringResourceId), Toast.LENGTH_SHORT).show()
 }

@@ -15,23 +15,29 @@ import java.util.Date
 class ReportsViewModel : ViewModel() {
     private val repository = ReportsRepository()
 
+    // Handles date of last data retrieval attempt
     private val _lastChecked = MutableLiveData<Date>()
     val lastChecked: LiveData<Date> = _lastChecked
+
+    // Handles the state of loading process
     private val _loadingStatus = MutableLiveData<LoadingStatus>()
     val loadingStatus: LiveData<LoadingStatus> = _loadingStatus
+
+    // Handles the state of fetching process
     private val _fetchingStatus = MutableLiveData<FetchingStatus>()
     val fetchingStatus: LiveData<FetchingStatus> = _fetchingStatus
 
     val reports: LiveData<List<Report>?> = repository.reports
     val favorites: LiveData<List<Report>?> = repository.favorites
 
-    fun fetchReports() {
+    fun fetchAngGetReports() {
         viewModelScope.launch {
             _lastChecked.value = Date()
             try {
                 _fetchingStatus.value = FetchingStatus.LOADING
                 repository.fetchReports()
                 _fetchingStatus.value = FetchingStatus.DONE
+                loadReports()
             } catch (e: UnknownHostException) {
                 _fetchingStatus.value = FetchingStatus.NO_INTERNET_CONNECTION
             } catch (e: Exception) {
@@ -40,16 +46,15 @@ class ReportsViewModel : ViewModel() {
         }
     }
 
+    // Retrieves all reports
     fun loadReports() {
         viewModelScope.launch {
             _lastChecked.value = Date()
             try {
                 _loadingStatus.value = LoadingStatus.LOADING
-                repository.fetchReports()
                 repository.getReports()
                 _loadingStatus.value = LoadingStatus.DONE
             } catch (e: UnknownHostException) {
-                repository.getReports()
                 _loadingStatus.value = LoadingStatus.NO_INTERNET_CONNECTION
             } catch (e: Exception) {
                 _loadingStatus.value = LoadingStatus.ERROR
@@ -57,6 +62,7 @@ class ReportsViewModel : ViewModel() {
         }
     }
 
+    // Retrieves favorite reports
     fun loadFavorites() {
         viewModelScope.launch {
             try {
@@ -69,6 +75,7 @@ class ReportsViewModel : ViewModel() {
         }
     }
 
+    // Updates a report's isFavorite value
     fun setFavoriteFieldOfReport(reportId: String, isFavorite: Boolean) {
         viewModelScope.launch {
             repository.updateFavoriteFieldOfReport(reportId, isFavorite)

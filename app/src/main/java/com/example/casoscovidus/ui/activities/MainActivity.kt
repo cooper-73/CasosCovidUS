@@ -48,9 +48,10 @@ class MainActivity : AppCompatActivity() {
             }
 
             if (fragment != null) {
-                supportFragmentManager.beginTransaction().replace(R.id.fl_container, fragment!!)
+                supportFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.fl_container, fragment!!)
                     .commit()
-
             }
         }
     }
@@ -86,10 +87,8 @@ class MainActivity : AppCompatActivity() {
     override fun onBackPressed() {
         if (viewModel.fragmentSelected.value != FragmentType.ALL) {
             viewModel.setFragmentSelected(FragmentType.ALL)
-        }
-        else {
+        } else {
             super.onBackPressed()
         }
     }
-
 }

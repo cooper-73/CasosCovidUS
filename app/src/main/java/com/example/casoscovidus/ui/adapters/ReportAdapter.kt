@@ -28,6 +28,7 @@ class ReportAdapter(owner: ViewModelStoreOwner, val fragmentHolderType: Fragment
         fun bind(report: Report, position: Int) {
             val context = binding.root.context
 
+            // Binds data of report to item UI
             binding.tvDate.text = context.getString(R.string.date_msg, report.date.toDate())
             binding.tvPositive.text = context.getString(
                 R.string.positive_msg,
@@ -41,28 +42,22 @@ class ReportAdapter(owner: ViewModelStoreOwner, val fragmentHolderType: Fragment
             )
             binding.chbFavorite.isChecked = report.isFavorite
 
-            binding.chbFavorite.setOnCheckedChangeListener { buttonView, isChecked ->
+            // Sets listeners for views of item UI
+            binding.chbFavorite.setOnCheckedChangeListener { buttonView, isFavorite ->
                 if (buttonView.isPressed) {
                     when (fragmentHolderType) {
                         FragmentType.ALL -> {
-                            changeFavoriteValueAt(position, isChecked)
+                            changeFavoriteValueAt(position, isFavorite)
                         }
 
                         FragmentType.FAVORITES -> {
-                            if (!isChecked) removeItem(position)
+                            if (!isFavorite) removeItem(position)
                         }
                     }
-                    viewModel.setFavoriteFieldOfReport(report.id, isChecked)
+                    viewModel.setFavoriteFieldOfReport(report.id, isFavorite)
                 }
             }
         }
-    }
-
-    private fun changeFavoriteValueAt(position: Int, checked: Boolean) {
-        reports = reports.mapIndexed { index, report ->
-            if (index == position)  report.copy(isFavorite = checked)
-            else    report
-        }.toMutableList()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -85,14 +80,24 @@ class ReportAdapter(owner: ViewModelStoreOwner, val fragmentHolderType: Fragment
         holder.bind(report, position)
     }
 
+    // Sets the data of the items
     fun setData(newReports: List<Report>) {
-        reports.addAll(newReports)
+        reports = newReports.toMutableList()
         notifyItemRangeChanged(0, newReports.size)
     }
 
+    // Removes item by position and notifies changes
     fun removeItem(position: Int) {
-        reports = reports.filterIndexed  { index, _ -> index != position }.toMutableList()
+        reports = reports.filterIndexed { index, _ -> index != position }.toMutableList()
         notifyItemRemoved(position)
         notifyItemRangeChanged(position, itemCount)
+    }
+
+    // Sets the favorite field of item at passed position
+    private fun changeFavoriteValueAt(position: Int, isFavorite: Boolean) {
+        reports = reports.mapIndexed { index, report ->
+            if (index == position) report.copy(isFavorite = isFavorite)
+            else report
+        }.toMutableList()
     }
 }
