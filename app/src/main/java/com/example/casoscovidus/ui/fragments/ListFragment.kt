@@ -97,12 +97,14 @@ class ListFragment : Fragment() {
 
     private fun fetchNewReports() {
         binding.swlReports.isRefreshing = true
-        viewModel.newReports.observe(viewLifecycleOwner) {
-            binding.swlReports.isRefreshing = false
+        viewModel.isRefreshing.observe(viewLifecycleOwner) { isRefreshing ->
+            if (!isRefreshing) {
+                binding.swlReports.isRefreshing = false
+            }
             if (isAllListSelected) {
                 viewModel.loadReports()
             }
-            viewModel.newReports.removeObservers(viewLifecycleOwner)
+            viewModel.isRefreshing.removeObservers(viewLifecycleOwner)
         }
         viewModel.fetchReports()
     }

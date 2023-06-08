@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.casoscovidus.data.models.Report
 import com.example.casoscovidus.data.repository.ReportsRepository
 import kotlinx.coroutines.launch
+import java.net.UnknownHostException
 import java.util.Date
 
 class ReportsViewModel : ViewModel() {
@@ -15,7 +16,7 @@ class ReportsViewModel : ViewModel() {
     val lastChecked: LiveData<Date> = _lastChecked
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
-    val newReports: LiveData<List<Report>> = repository.newReports
+    val isRefreshing = MutableLiveData<Boolean>()
     val reports: LiveData<List<Report>> = repository.reports
     val favorites: LiveData<List<Report>> = repository.favorites
 
@@ -26,7 +27,13 @@ class ReportsViewModel : ViewModel() {
     fun fetchReports() {
         _lastChecked.value = Date()
         viewModelScope.launch {
-            repository.fetchReports()
+            try {
+                isRefreshing.value = true
+                repository.fetchReports()
+                isRefreshing.value = false
+            } catch (e: UnknownHostException) {
+                isRefreshing.value = false
+            }
         }
     }
 
