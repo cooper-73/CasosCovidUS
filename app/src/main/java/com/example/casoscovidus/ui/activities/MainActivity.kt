@@ -83,4 +83,13 @@ class MainActivity : AppCompatActivity() {
         binding.vAllLine.visibility = View.INVISIBLE
     }
 
+    override fun onBackPressed() {
+        if (viewModel.fragmentSelected.value != FragmentType.ALL) {
+            viewModel.setFragmentSelected(FragmentType.ALL)
+        }
+        else {
+            super.onBackPressed()
+        }
+    }
+
 }
