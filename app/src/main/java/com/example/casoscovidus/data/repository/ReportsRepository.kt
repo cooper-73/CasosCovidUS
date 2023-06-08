@@ -10,6 +10,7 @@ import kotlinx.coroutines.withContext
 
 class ReportsRepository {
     private val database = AppDatabase.getDatabase(MyApp.getContext())
+    val newReports = MutableLiveData<List<Report>>()
     val reports = MutableLiveData<List<Report>>()
     val favorites = MutableLiveData<List<Report>>()
 
@@ -17,6 +18,9 @@ class ReportsRepository {
         return withContext(Dispatchers.IO) {
             val reportsResponse = RetrofitClient.reportsService.getReports()
             database.reportDao().insertReports(reportsResponse)
+            withContext(Dispatchers.Main) {
+                newReports.value = reportsResponse
+            }
         }
     }
 

@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 class ReportsViewModel : ViewModel() {
     private val repository = ReportsRepository()
 
+    val newReports: LiveData<List<Report>> = repository.newReports
     val reports: LiveData<List<Report>> = repository.reports
     val favorites: LiveData<List<Report>> = repository.favorites
 

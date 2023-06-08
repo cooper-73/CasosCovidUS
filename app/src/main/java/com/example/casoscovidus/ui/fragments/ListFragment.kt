@@ -35,9 +35,16 @@ class ListFragment : Fragment() {
 
         initObservers()
         initUI()
+        initListeners()
         loadData()
 
         return binding.root
+    }
+
+    private fun initListeners() {
+        binding.swlReports.setOnRefreshListener {
+            fetchNewReports()
+        }
     }
 
     private fun bindViewModel() {
@@ -62,6 +69,18 @@ class ListFragment : Fragment() {
         binding.rvReports.layoutManager = LinearLayoutManager(context)
         adapter = ReportAdapter(this)
         binding.rvReports.adapter = adapter
+    }
+
+    private fun fetchNewReports() {
+        binding.swlReports.isRefreshing = true
+        viewModel.newReports.observe(viewLifecycleOwner) {
+            binding.swlReports.isRefreshing = false
+            if (isAllListSelected) {
+                viewModel.loadReports()
+            }
+            viewModel.newReports.removeObservers(viewLifecycleOwner)
+        }
+        viewModel.fetchReports()
     }
 
     private fun loadData() {
