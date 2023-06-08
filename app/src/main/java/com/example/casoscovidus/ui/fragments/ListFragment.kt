@@ -14,6 +14,7 @@ import com.example.casoscovidus.databinding.FragmentListBinding
 import com.example.casoscovidus.ui.adapters.ReportAdapter
 import com.example.casoscovidus.utils.FetchingStatus
 import com.example.casoscovidus.utils.FragmentType
+import com.example.casoscovidus.utils.LoadingStatus
 import com.example.casoscovidus.utils.toDateTime
 import com.example.casoscovidus.viewmodels.ReportsViewModel
 
@@ -73,10 +74,17 @@ class ListFragment : Fragment() {
                 getString(R.string.last_update_msg, lastChecked.toDateTime())
         }
 
-        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            if (isLoading) {
+        viewModel.loadingStatus.observe(viewLifecycleOwner) { loadingStatus ->
+            if (loadingStatus == LoadingStatus.LOADING) {
                 binding.pbLoading.visibility = View.VISIBLE
             } else {
+                if (loadingStatus == LoadingStatus.ERROR) {
+                    Toast.makeText(
+                        context,
+                        getString(R.string.unexpected_error_msg),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
                 binding.pbLoading.visibility = View.GONE
             }
         }
@@ -123,13 +131,13 @@ class ListFragment : Fragment() {
 
                     FetchingStatus.ERROR -> Toast.makeText(
                         context,
-                        getString(R.string.unexpected_error),
+                        getString(R.string.unexpected_error_msg),
                         Toast.LENGTH_SHORT
                     ).show()
 
                     else -> {}
                 }
-                
+
                 viewModel.fetchingStatus.removeObservers(viewLifecycleOwner)
             }
         }

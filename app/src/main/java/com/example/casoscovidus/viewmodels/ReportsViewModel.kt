@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.casoscovidus.data.models.Report
 import com.example.casoscovidus.data.repository.ReportsRepository
 import com.example.casoscovidus.utils.FetchingStatus
+import com.example.casoscovidus.utils.LoadingStatus
 import kotlinx.coroutines.launch
 import java.net.UnknownHostException
 import java.util.Date
@@ -16,8 +17,8 @@ class ReportsViewModel : ViewModel() {
 
     private val _lastChecked = MutableLiveData<Date>()
     val lastChecked: LiveData<Date> = _lastChecked
-    private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean> = _isLoading
+    private val _loadingStatus = MutableLiveData<LoadingStatus>()
+    val loadingStatus: LiveData<LoadingStatus> = _loadingStatus
     private val _fetchingStatus = MutableLiveData<FetchingStatus>()
     val fetchingStatus: LiveData<FetchingStatus> = _fetchingStatus
 
@@ -45,17 +46,25 @@ class ReportsViewModel : ViewModel() {
 
     fun loadReports() {
         viewModelScope.launch {
-            _isLoading.value = true
-            repository.getReports()
-            _isLoading.value = false
+            try {
+                _loadingStatus.value = LoadingStatus.LOADING
+                repository.getReports()
+                _loadingStatus.value = LoadingStatus.DONE
+            } catch (e: Exception) {
+                _loadingStatus.value = LoadingStatus.ERROR
+            }
         }
     }
 
     fun loadFavorites() {
         viewModelScope.launch {
-            _isLoading.value = true
-            repository.getFavorites()
-            _isLoading.value = false
+            try {
+                _loadingStatus.value = LoadingStatus.LOADING
+                repository.getFavorites()
+                _loadingStatus.value = LoadingStatus.DONE
+            } catch (e: Exception) {
+                _loadingStatus.value = LoadingStatus.ERROR
+            }
         }
     }
 
