@@ -146,10 +146,9 @@ class ListFragment : Fragment() {
     }
 
     private fun loadData() {
-        if (fragmentType == FragmentType.ALL) {
-            viewModel.loadReports()
-        } else if (fragmentType == FragmentType.FAVORITES) {
-            viewModel.loadFavorites()
+        when (fragmentType) {
+            FragmentType.ALL -> viewModel.loadReports()
+            FragmentType.FAVORITES -> viewModel.loadFavorites()
         }
     }
 
