@@ -5,12 +5,14 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.casoscovidus.R
 import com.example.casoscovidus.databinding.FragmentListBinding
 import com.example.casoscovidus.ui.adapters.ReportAdapter
+import com.example.casoscovidus.utils.FetchingStatus
 import com.example.casoscovidus.utils.FragmentType
 import com.example.casoscovidus.utils.toDateTime
 import com.example.casoscovidus.viewmodels.ReportsViewModel
@@ -70,6 +72,7 @@ class ListFragment : Fragment() {
             binding.tvLastUpdate.text =
                 getString(R.string.last_update_msg, lastChecked.toDateTime())
         }
+
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             if (isLoading) {
                 binding.pbLoading.visibility = View.VISIBLE
@@ -83,6 +86,7 @@ class ListFragment : Fragment() {
         if (fragmentType == FragmentType.FAVORITES) {
             binding.tvLastUpdate.visibility = View.GONE
         }
+
         binding.swlReports.setColorSchemeColors(getPrimaryColor())
         binding.rvReports.layoutManager = LinearLayoutManager(context)
         adapter = ReportAdapter(this, fragmentType)
@@ -91,23 +95,45 @@ class ListFragment : Fragment() {
 
     private fun getPrimaryColor(): Int {
         val typedValue = TypedValue()
+
         requireContext().theme.resolveAttribute(
             androidx.appcompat.R.attr.colorPrimary, typedValue, true
         )
+
         return typedValue.resourceId
     }
 
     private fun fetchNewReports() {
         binding.swlReports.isRefreshing = true
-        viewModel.isRefreshing.observe(viewLifecycleOwner) { isRefreshing ->
-            if (!isRefreshing) {
+
+        viewModel.fetchingStatus.observe(viewLifecycleOwner) { fetchingStatus ->
+            if (fetchingStatus != FetchingStatus.LOADING) {
                 binding.swlReports.isRefreshing = false
+
+                if (fragmentType == FragmentType.ALL) {
+                    viewModel.loadReports()
+                }
+
+                when (fetchingStatus) {
+                    FetchingStatus.NO_INTERNET_CONNECTION -> Toast.makeText(
+                        context,
+                        getString(R.string.no_internet_connection_msg),
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    FetchingStatus.ERROR -> Toast.makeText(
+                        context,
+                        getString(R.string.unexpected_error),
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    else -> {}
+                }
+                
+                viewModel.fetchingStatus.removeObservers(viewLifecycleOwner)
             }
-            if (fragmentType == FragmentType.ALL) {
-                viewModel.loadReports()
-            }
-            viewModel.isRefreshing.removeObservers(viewLifecycleOwner)
         }
+
         viewModel.fetchReports()
     }
 

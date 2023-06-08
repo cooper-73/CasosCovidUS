@@ -10,4 +10,7 @@
     <string name="date_msg">%1$s</string>
     <string name="positive_msg">Positive: %1$s ( + %2$s )</string>
     <string name="death_msg">Death: %1$s ( + %2$s )</string>
+    <!--    Error Toast Messages-->
+    <string name="no_internet_connection_msg">Failed to fetch data. Check your connection.</string>
+    <string name="unexpected_error">Oops! Something went wrong. Please try again.</string>
 </resources>
