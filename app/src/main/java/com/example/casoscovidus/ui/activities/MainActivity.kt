@@ -8,13 +8,14 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.casoscovidus.R
 import com.example.casoscovidus.databinding.ActivityMainBinding
 import com.example.casoscovidus.ui.fragments.ListFragment
+import com.example.casoscovidus.utils.FragmentType
 import com.example.casoscovidus.viewmodels.MainViewModel
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainViewModel
-    private var fragment = ListFragment.newInstance(true)
+    private var fragment: ListFragment? = ListFragment.newInstance(true)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,25 +32,38 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initObservers() {
-        viewModel.isAllListSelected.observe(this) { isAllListSelected ->
-            fragment = if (isAllListSelected) {
-                showAllOptionSelected()
-                ListFragment.newInstance(true)
-            } else {
-                showFavoritesOptionSelected()
-                ListFragment.newInstance(false)
+        viewModel.fragmentSelected.observe(this) { fragmentSelected ->
+            fragment = when (fragmentSelected) {
+                FragmentType.ALL -> {
+                    showAllOptionSelected()
+                    ListFragment.newInstance(true)
+                }
+
+                FragmentType.FAVORITES -> {
+                    showFavoritesOptionSelected()
+                    ListFragment.newInstance(false)
+                }
+
+                else -> null
             }
-            supportFragmentManager.beginTransaction().replace(R.id.fl_container, fragment).commit()
+
+            if (fragment != null) {
+                supportFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.fl_container, fragment!!)
+                    .commit()
+
+            }
         }
     }
 
     private fun initListeners() {
         binding.tvAllList.setOnClickListener {
-            viewModel.markAllListSelected(true)
+            viewModel.setFragmentSelected(FragmentType.ALL)
         }
 
         binding.tvFavoriteList.setOnClickListener {
-            viewModel.markAllListSelected(false)
+            viewModel.setFragmentSelected(FragmentType.FAVORITES)
         }
     }
 
