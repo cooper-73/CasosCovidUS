@@ -182,7 +182,7 @@ class ListFragment : Fragment() {
     }
 
     private fun showToast(stringResourceId: Int) =
-        Toast.makeText(context, getString(stringResourceId), Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, getString(stringResourceId), Toast.LENGTH_LONG).show()
 
     private fun setEmptyDataMsgVisibility(visibility: Int) {
         binding.tvEmptyMsg.visibility = visibility
