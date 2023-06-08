@@ -68,6 +68,13 @@ class ListFragment : Fragment() {
             binding.tvLastUpdate.text =
                 getString(R.string.last_update_msg, lastChecked.toDateTime())
         }
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            if (isLoading) {
+                binding.pbLoading.visibility = View.VISIBLE
+            } else {
+                binding.pbLoading.visibility = View.GONE
+            }
+        }
     }
 
     private fun initUI() {

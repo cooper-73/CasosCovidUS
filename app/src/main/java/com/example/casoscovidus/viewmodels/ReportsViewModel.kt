@@ -13,6 +13,8 @@ class ReportsViewModel : ViewModel() {
     private val repository = ReportsRepository()
     private val _lastChecked = MutableLiveData<Date>()
     val lastChecked: LiveData<Date> = _lastChecked
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> = _isLoading
     val newReports: LiveData<List<Report>> = repository.newReports
     val reports: LiveData<List<Report>> = repository.reports
     val favorites: LiveData<List<Report>> = repository.favorites
@@ -30,13 +32,17 @@ class ReportsViewModel : ViewModel() {
 
     fun loadReports() {
         viewModelScope.launch {
+            _isLoading.value = true
             repository.getReports()
+            _isLoading.value = false
         }
     }
 
     fun loadFavorites() {
         viewModelScope.launch {
+            _isLoading.value = true
             repository.getFavorites()
+            _isLoading.value = false
         }
     }
 
