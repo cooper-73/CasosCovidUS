@@ -7,7 +7,7 @@
     <!--    List Fragment-->
     <string name="last_update_msg">Last checked: %1$s</string>
     <!--    Report Item-->
-    <string name="date_msg">Date: %1$s</string>
+    <string name="date_msg">%1$s</string>
     <string name="positive_msg">Positive: %1$s ( + %2$s )</string>
     <string name="death_msg">Death: %1$s ( + %2$s )</string>
 </resources>
