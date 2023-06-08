@@ -1,4 +1,4 @@
-package com.example.casoscovidus.adapters
+package com.example.casoscovidus.ui.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,11 +8,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.casoscovidus.R
 import com.example.casoscovidus.data.models.Report
 import com.example.casoscovidus.databinding.ReportItemBinding
+import com.example.casoscovidus.utils.FragmentType
 import com.example.casoscovidus.utils.formatWithSeparator
 import com.example.casoscovidus.utils.toDate
 import com.example.casoscovidus.viewmodels.ReportsViewModel
 
-class ReportAdapter(owner: ViewModelStoreOwner) : RecyclerView.Adapter<ReportAdapter.ViewHolder>() {
+class ReportAdapter(owner: ViewModelStoreOwner, val fragmentHolderType: FragmentType) :
+    RecyclerView.Adapter<ReportAdapter.ViewHolder>() {
 
     private val reports: MutableList<Report> = mutableListOf()
     private var viewModel: ReportsViewModel
@@ -41,7 +43,9 @@ class ReportAdapter(owner: ViewModelStoreOwner) : RecyclerView.Adapter<ReportAda
 
             binding.chbFavorite.setOnCheckedChangeListener { buttonView, isChecked ->
                 if (buttonView.isPressed) {
-                    if (!isChecked) removeItem(position)
+                    if (!isChecked && fragmentHolderType == FragmentType.FAVORITES) {
+                        removeItem(position)
+                    }
                     viewModel.setFavoriteFieldOfReport(report.id, isChecked)
                 }
             }

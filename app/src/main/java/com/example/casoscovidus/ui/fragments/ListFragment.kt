@@ -9,8 +9,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.casoscovidus.R
-import com.example.casoscovidus.adapters.ReportAdapter
 import com.example.casoscovidus.databinding.FragmentListBinding
+import com.example.casoscovidus.ui.adapters.ReportAdapter
 import com.example.casoscovidus.utils.FragmentType
 import com.example.casoscovidus.utils.toDateTime
 import com.example.casoscovidus.viewmodels.ReportsViewModel
@@ -85,7 +85,7 @@ class ListFragment : Fragment() {
         }
         binding.swlReports.setColorSchemeColors(getPrimaryColor())
         binding.rvReports.layoutManager = LinearLayoutManager(context)
-        adapter = ReportAdapter(this)
+        adapter = ReportAdapter(this, fragmentType)
         binding.rvReports.adapter = adapter
     }
 
