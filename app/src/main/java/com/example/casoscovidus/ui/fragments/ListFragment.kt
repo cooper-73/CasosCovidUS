@@ -11,23 +11,25 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.casoscovidus.R
 import com.example.casoscovidus.adapters.ReportAdapter
 import com.example.casoscovidus.databinding.FragmentListBinding
+import com.example.casoscovidus.utils.FragmentType
 import com.example.casoscovidus.utils.toDateTime
 import com.example.casoscovidus.viewmodels.ReportsViewModel
 
-private const val IS_ALL_LIST_SELECTED = "is_all_list_selected"
+private const val FRAGMENT_TYPE = "fragment_type"
 
 class ListFragment : Fragment() {
 
     private lateinit var binding: FragmentListBinding
     private lateinit var viewModel: ReportsViewModel
     private lateinit var adapter: ReportAdapter
-    private var isAllListSelected: Boolean = true
+    private var fragmentType: FragmentType = FragmentType.ALL
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         bindViewModel()
-        isAllListSelected = arguments?.getBoolean(IS_ALL_LIST_SELECTED) ?: true
+        fragmentType =
+            arguments?.getSerializable(FRAGMENT_TYPE) as? FragmentType ?: FragmentType.ALL
     }
 
     override fun onCreateView(
@@ -54,11 +56,11 @@ class ListFragment : Fragment() {
     }
 
     private fun initObservers() {
-        if (isAllListSelected) {
+        if (fragmentType == FragmentType.ALL) {
             viewModel.reports.observe(viewLifecycleOwner) { reports ->
                 adapter.setData(reports)
             }
-        } else {
+        } else if (fragmentType == FragmentType.FAVORITES) {
             viewModel.favorites.observe(viewLifecycleOwner) { favorites ->
                 adapter.setData(favorites)
             }
@@ -78,7 +80,9 @@ class ListFragment : Fragment() {
     }
 
     private fun initUI() {
-        if (!isAllListSelected) binding.tvLastUpdate.visibility = View.GONE
+        if (fragmentType == FragmentType.FAVORITES) {
+            binding.tvLastUpdate.visibility = View.GONE
+        }
         binding.swlReports.setColorSchemeColors(getPrimaryColor())
         binding.rvReports.layoutManager = LinearLayoutManager(context)
         adapter = ReportAdapter(this)
@@ -88,9 +92,7 @@ class ListFragment : Fragment() {
     private fun getPrimaryColor(): Int {
         val typedValue = TypedValue()
         requireContext().theme.resolveAttribute(
-            androidx.appcompat.R.attr.colorPrimary,
-            typedValue,
-            true
+            androidx.appcompat.R.attr.colorPrimary, typedValue, true
         )
         return typedValue.resourceId
     }
@@ -101,7 +103,7 @@ class ListFragment : Fragment() {
             if (!isRefreshing) {
                 binding.swlReports.isRefreshing = false
             }
-            if (isAllListSelected) {
+            if (fragmentType == FragmentType.ALL) {
                 viewModel.loadReports()
             }
             viewModel.isRefreshing.removeObservers(viewLifecycleOwner)
@@ -110,19 +112,19 @@ class ListFragment : Fragment() {
     }
 
     private fun loadData() {
-        if (isAllListSelected) {
+        if (fragmentType == FragmentType.ALL) {
             viewModel.loadReports()
-        } else {
+        } else if (fragmentType == FragmentType.FAVORITES) {
             viewModel.loadFavorites()
         }
     }
 
     companion object {
         @JvmStatic
-        fun newInstance(isAllListSelected: Boolean): ListFragment {
+        fun newInstance(fragmentType: FragmentType): ListFragment {
             return ListFragment().apply {
                 arguments = Bundle().apply {
-                    putBoolean(IS_ALL_LIST_SELECTED, isAllListSelected)
+                    putSerializable(FRAGMENT_TYPE, fragmentType)
                 }
             }
         }

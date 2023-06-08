@@ -15,7 +15,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MainViewModel
-    private var fragment: ListFragment? = ListFragment.newInstance(true)
+    private var fragment: ListFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,21 +36,19 @@ class MainActivity : AppCompatActivity() {
             fragment = when (fragmentSelected) {
                 FragmentType.ALL -> {
                     showAllOptionSelected()
-                    ListFragment.newInstance(true)
+                    ListFragment.newInstance(FragmentType.ALL)
                 }
 
                 FragmentType.FAVORITES -> {
                     showFavoritesOptionSelected()
-                    ListFragment.newInstance(false)
+                    ListFragment.newInstance(FragmentType.FAVORITES)
                 }
 
                 else -> null
             }
 
             if (fragment != null) {
-                supportFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.fl_container, fragment!!)
+                supportFragmentManager.beginTransaction().replace(R.id.fl_container, fragment!!)
                     .commit()
 
             }
