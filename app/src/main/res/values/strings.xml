@@ -13,4 +13,7 @@
     <!--    Error Toast Messages-->
     <string name="no_internet_connection_msg">Failed to fetch data. Check your connection.</string>
     <string name="unexpected_error_msg">Oops! Something went wrong. Please try again.</string>
+    <!--    Empty Recycle View Data Messages-->
+    <string name="no_reports_msg">No reports found.</string>
+    <string name="no_favorite_reports_msg">No favorite reports found. Try adding some in the All section to see them here.</string>
 </resources>

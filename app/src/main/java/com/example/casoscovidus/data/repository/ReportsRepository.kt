@@ -10,8 +10,10 @@ import kotlinx.coroutines.withContext
 
 class ReportsRepository {
     private val database = AppDatabase.getDatabase(MyApp.getContext())
-    val reports = MutableLiveData<List<Report>?>()
-    val favorites = MutableLiveData<List<Report>?>()
+
+    val reports = MutableLiveData<List<Report>>()
+    val favorites = MutableLiveData<List<Report>>()
+    val isDataEmpty = MutableLiveData<Boolean>(false)
 
     // Fetches data from services and stores response in local database if successful
     suspend fun fetchReports() {
@@ -35,6 +37,7 @@ class ReportsRepository {
                 reportList = database.reportDao().getReports()
             }
             withContext(Dispatchers.Main) {
+                isDataEmpty.value = reportList.isEmpty()
                 reports.value = reportList
             }
         }
@@ -45,6 +48,7 @@ class ReportsRepository {
         return withContext(Dispatchers.IO) {
             val favoriteList = database.reportDao().getFavorites()
             withContext(Dispatchers.Main) {
+                isDataEmpty.value = favoriteList.isEmpty()
                 favorites.value = favoriteList
             }
         }
@@ -56,5 +60,10 @@ class ReportsRepository {
             val report = database.reportDao().getReport(reportId).copy(isFavorite = isFavorite)
             database.reportDao().updateReport(report)
         }
+    }
+
+    // Sets isDataEmpty status
+    fun setDataEmpty(isEmpty: Boolean) {
+        isDataEmpty.value = isEmpty
     }
 }

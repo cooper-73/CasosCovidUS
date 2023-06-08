@@ -91,6 +91,7 @@ class ReportAdapter(owner: ViewModelStoreOwner, val fragmentHolderType: Fragment
         reports = reports.filterIndexed { index, _ -> index != position }.toMutableList()
         notifyItemRemoved(position)
         notifyItemRangeChanged(position, itemCount)
+        viewModel.setDataEmptyStatus(reports.isEmpty())
     }
 
     // Sets the favorite field of item at passed position

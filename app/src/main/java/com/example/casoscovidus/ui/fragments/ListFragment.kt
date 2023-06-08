@@ -104,11 +104,26 @@ class ListFragment : Fragment() {
                 else -> {}
             }
         }
+
+        viewModel.isDataEmpty.observe(viewLifecycleOwner) { isDataEmpty ->
+            if (isDataEmpty) {
+                setEmptyDataMsgVisibility(View.VISIBLE)
+            } else {
+                setEmptyDataMsgVisibility(View.GONE)
+            }
+        }
     }
 
     private fun initUI() {
-        if (fragmentType == FragmentType.FAVORITES) {
-            binding.tvLastUpdate.visibility = View.GONE
+        when (fragmentType) {
+            FragmentType.ALL -> {
+                binding.tvEmptyMsg.text = getString(R.string.no_reports_msg)
+            }
+
+            FragmentType.FAVORITES -> {
+                binding.tvLastUpdate.visibility = View.GONE
+                binding.tvEmptyMsg.text = getString(R.string.no_favorite_reports_msg)
+            }
         }
 
         binding.swlReports.setColorSchemeColors(getPrimaryColor())
@@ -128,9 +143,12 @@ class ListFragment : Fragment() {
         return typedValue.resourceId
     }
 
-    // Handles fetching behavior when user has swiped the refresh layout
+    // Handles fetching behavior when user has swiped the refresh layout in All fragment
     private fun fetchNewReports() {
-        binding.swlReports.isRefreshing = true
+        if (fragmentType != FragmentType.ALL) {
+            binding.swlReports.isRefreshing = false
+            return
+        }
 
         viewModel.fetchingStatus.observe(viewLifecycleOwner) { fetchingStatus ->
             if (fetchingStatus != FetchingStatus.LOADING) {
@@ -165,4 +183,8 @@ class ListFragment : Fragment() {
 
     private fun showToast(stringResourceId: Int) =
         Toast.makeText(context, getString(stringResourceId), Toast.LENGTH_SHORT).show()
+
+    private fun setEmptyDataMsgVisibility(visibility: Int) {
+        binding.tvEmptyMsg.visibility = visibility
+    }
 }

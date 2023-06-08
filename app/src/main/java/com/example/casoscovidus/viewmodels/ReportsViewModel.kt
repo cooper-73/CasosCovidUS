@@ -27,9 +27,11 @@ class ReportsViewModel : ViewModel() {
     private val _fetchingStatus = MutableLiveData<FetchingStatus>()
     val fetchingStatus: LiveData<FetchingStatus> = _fetchingStatus
 
-    val reports: LiveData<List<Report>?> = repository.reports
-    val favorites: LiveData<List<Report>?> = repository.favorites
+    val reports: LiveData<List<Report>> = repository.reports
+    val favorites: LiveData<List<Report>> = repository.favorites
+    val isDataEmpty: LiveData<Boolean> = repository.isDataEmpty
 
+    // Fetches and retrieves all reports
     fun fetchAngGetReports() {
         viewModelScope.launch {
             _lastChecked.value = Date()
@@ -42,6 +44,8 @@ class ReportsViewModel : ViewModel() {
                 _fetchingStatus.value = FetchingStatus.NO_INTERNET_CONNECTION
             } catch (e: Exception) {
                 _fetchingStatus.value = FetchingStatus.ERROR
+            } finally {
+                repository.setDataEmpty(checkIfDataIsEmpty())
             }
         }
     }
@@ -58,6 +62,8 @@ class ReportsViewModel : ViewModel() {
                 _loadingStatus.value = LoadingStatus.NO_INTERNET_CONNECTION
             } catch (e: Exception) {
                 _loadingStatus.value = LoadingStatus.ERROR
+            } finally {
+                repository.setDataEmpty(checkIfDataIsEmpty())
             }
         }
     }
@@ -80,5 +86,13 @@ class ReportsViewModel : ViewModel() {
         viewModelScope.launch {
             repository.updateFavoriteFieldOfReport(reportId, isFavorite)
         }
+    }
+
+    // Checks if reports is null or empty
+    private fun checkIfDataIsEmpty() = reports.value?.isEmpty() ?: true
+
+    // Updates status of data length
+    fun setDataEmptyStatus(isEmpty: Boolean) {
+        repository.setDataEmpty(isEmpty)
     }
 }
