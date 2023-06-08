@@ -1,6 +1,7 @@
 package com.example.casoscovidus.ui.fragments
 
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.casoscovidus.R
 import com.example.casoscovidus.adapters.ReportAdapter
 import com.example.casoscovidus.databinding.FragmentListBinding
+import com.example.casoscovidus.utils.toDateTime
 import com.example.casoscovidus.viewmodels.ReportsViewModel
 
 private const val IS_ALL_LIST_SELECTED = "is_all_list_selected"
@@ -61,14 +63,29 @@ class ListFragment : Fragment() {
                 adapter.setData(favorites)
             }
         }
+
+        viewModel.lastChecked.observe(viewLifecycleOwner) { lastChecked ->
+            binding.tvLastUpdate.text =
+                getString(R.string.last_update_msg, lastChecked.toDateTime())
+        }
     }
 
     private fun initUI() {
-        binding.tvLastUpdate.text = getString(R.string.last_update_msg, "Now")
-
+        if (!isAllListSelected) binding.tvLastUpdate.visibility = View.GONE
+        binding.swlReports.setColorSchemeColors(getPrimaryColor())
         binding.rvReports.layoutManager = LinearLayoutManager(context)
         adapter = ReportAdapter(this)
         binding.rvReports.adapter = adapter
+    }
+
+    private fun getPrimaryColor(): Int {
+        val typedValue = TypedValue()
+        requireContext().theme.resolveAttribute(
+            androidx.appcompat.R.attr.colorPrimary,
+            typedValue,
+            true
+        )
+        return typedValue.resourceId
     }
 
     private fun fetchNewReports() {
