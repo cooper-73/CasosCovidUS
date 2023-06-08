@@ -16,7 +16,7 @@ import com.example.casoscovidus.viewmodels.ReportsViewModel
 class ReportAdapter(owner: ViewModelStoreOwner, val fragmentHolderType: FragmentType) :
     RecyclerView.Adapter<ReportAdapter.ViewHolder>() {
 
-    private val reports: MutableList<Report> = mutableListOf()
+    private var reports: MutableList<Report> = mutableListOf()
     private var viewModel: ReportsViewModel
 
     init {
@@ -43,13 +43,26 @@ class ReportAdapter(owner: ViewModelStoreOwner, val fragmentHolderType: Fragment
 
             binding.chbFavorite.setOnCheckedChangeListener { buttonView, isChecked ->
                 if (buttonView.isPressed) {
-                    if (!isChecked && fragmentHolderType == FragmentType.FAVORITES) {
-                        removeItem(position)
+                    when (fragmentHolderType) {
+                        FragmentType.ALL -> {
+                            changeFavoriteValueAt(position, isChecked)
+                        }
+
+                        FragmentType.FAVORITES -> {
+                            if (!isChecked) removeItem(position)
+                        }
                     }
                     viewModel.setFavoriteFieldOfReport(report.id, isChecked)
                 }
             }
         }
+    }
+
+    private fun changeFavoriteValueAt(position: Int, checked: Boolean) {
+        reports = reports.mapIndexed { index, report ->
+            if (index == position)  report.copy(isFavorite = checked)
+            else    report
+        }.toMutableList()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -72,13 +85,13 @@ class ReportAdapter(owner: ViewModelStoreOwner, val fragmentHolderType: Fragment
         holder.bind(report, position)
     }
 
-    fun setData(reports: List<Report>) {
-        this.reports.addAll(reports)
-        notifyItemRangeChanged(0, reports.size)
+    fun setData(newReports: List<Report>) {
+        reports.addAll(newReports)
+        notifyItemRangeChanged(0, newReports.size)
     }
 
     fun removeItem(position: Int) {
-        reports.removeAt(position)
+        reports = reports.filterIndexed  { index, _ -> index != position }.toMutableList()
         notifyItemRemoved(position)
         notifyItemRangeChanged(position, itemCount)
     }
