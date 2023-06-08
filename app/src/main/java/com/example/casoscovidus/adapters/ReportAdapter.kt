@@ -2,21 +2,28 @@ package com.example.casoscovidus.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.example.casoscovidus.R
 import com.example.casoscovidus.data.models.Report
 import com.example.casoscovidus.databinding.ReportItemBinding
 import com.example.casoscovidus.utils.formatWithSeparator
 import com.example.casoscovidus.utils.toDate
+import com.example.casoscovidus.viewmodels.ReportsViewModel
 
-class ReportAdapter : RecyclerView.Adapter<ReportAdapter.ViewHolder>() {
+class ReportAdapter(owner: ViewModelStoreOwner) : RecyclerView.Adapter<ReportAdapter.ViewHolder>() {
 
-    private var reports: List<Report> = listOf()
+    private val reports: MutableList<Report> = mutableListOf()
+    private var viewModel: ReportsViewModel
+
+    init {
+        viewModel = ViewModelProvider(owner)[ReportsViewModel::class.java]
+    }
 
     inner class ViewHolder(private val binding: ReportItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(report: Report) {
+        fun bind(report: Report, position: Int) {
             val context = binding.root.context
 
             binding.tvDate.text = context.getString(R.string.date_msg, report.date.toDate())
@@ -34,8 +41,8 @@ class ReportAdapter : RecyclerView.Adapter<ReportAdapter.ViewHolder>() {
 
             binding.chbFavorite.setOnCheckedChangeListener { buttonView, isChecked ->
                 if (buttonView.isPressed) {
-                    val msg = if (isChecked) "Marked as favorite" else "Unmarked as favorite"
-                    Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                    if (!isChecked) removeItem(position)
+                    viewModel.setFavoriteFieldOfReport(report.id, isChecked)
                 }
             }
         }
@@ -58,11 +65,17 @@ class ReportAdapter : RecyclerView.Adapter<ReportAdapter.ViewHolder>() {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val report = reports[position]
-        holder.bind(report)
+        holder.bind(report, position)
     }
 
     fun setData(reports: List<Report>?) {
-        this.reports = reports ?: listOf()
+        this.reports.addAll(reports ?: listOf())
         notifyItemRangeChanged(0, reports?.size ?: 0)
+    }
+
+    fun removeItem(position: Int) {
+        reports.removeAt(position)
+        notifyItemRemoved(position)
+        notifyItemRangeChanged(position, itemCount)
     }
 }

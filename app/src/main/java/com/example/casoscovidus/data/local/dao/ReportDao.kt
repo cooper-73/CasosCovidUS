@@ -15,6 +15,9 @@ interface ReportDao {
     @Query("SELECT * FROM reports WHERE is_favorite = 1")
     suspend fun getFavorites(): List<Report>
 
+    @Query("SELECT * FROM reports WHERE id = :reportId")
+    suspend fun getReport(reportId: String): Report
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertReports(reports: List<Report>)
 

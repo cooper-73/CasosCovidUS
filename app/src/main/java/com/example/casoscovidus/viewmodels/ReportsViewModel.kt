@@ -34,4 +34,10 @@ class ReportsViewModel : ViewModel() {
             repository.getFavorites()
         }
     }
+
+    fun setFavoriteFieldOfReport(reportId: String, isFavorite: Boolean) {
+        viewModelScope.launch {
+            repository.updateFavoriteFieldOfReport(reportId, isFavorite)
+        }
+    }
 }

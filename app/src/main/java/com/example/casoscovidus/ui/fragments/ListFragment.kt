@@ -60,7 +60,7 @@ class ListFragment : Fragment() {
         binding.tvLastUpdate.text = getString(R.string.last_update_msg, "Now")
 
         binding.rvReports.layoutManager = LinearLayoutManager(context)
-        adapter = ReportAdapter()
+        adapter = ReportAdapter(this)
         binding.rvReports.adapter = adapter
     }
 

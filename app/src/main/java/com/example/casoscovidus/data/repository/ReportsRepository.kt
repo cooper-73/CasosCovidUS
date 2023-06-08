@@ -37,4 +37,11 @@ class ReportsRepository {
             }
         }
     }
+
+    suspend fun updateFavoriteFieldOfReport(reportId: String, isFavorite: Boolean) {
+        return withContext(Dispatchers.IO) {
+            val report = database.reportDao().getReport(reportId).copy(isFavorite = isFavorite)
+            database.reportDao().updateReport(report)
+        }
+    }
 }
